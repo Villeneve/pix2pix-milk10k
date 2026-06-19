@@ -2,3 +2,5 @@
 *.pth
 *.jpg
 *.jpeg
+imgs_success/
+imgs_fails/

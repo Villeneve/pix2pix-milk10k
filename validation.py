@@ -3,7 +3,7 @@ IFPB - Instituto Federal da Paraíba
 João Pessoa - Junho 2026
 Author - Me. Villeneve de Oliveira Soares
 
-Obs: Cada treinamento levou 1000 épocas com 131 atualizações.
+Obs: Cada treinamento levou 1000 épocas com 131 atualizações cada época.
 '''
 
 #%%
@@ -25,8 +25,9 @@ from src.models import *
 compose = tt.Compose([
     tt.Resize(128),
     tt.CenterCrop((128,128)),
-    # tt.ToTensor(),
-    tt.Normalize(127.5,127.5),
+    tt.ToTensor(),
+    # tt.Normalize(127.5,127.5),
+    tt.Normalize(.5,.5),
 ])
 deNormalize = tt.Compose([
     tt.Normalize(-1,2),
@@ -42,7 +43,8 @@ deNormalize = tt.Compose([
 #     tt.ToTensor(),
 #     tt.Normalize(.5,.5),
 # ])
-ds = FolderLoad(tt.PILToTensor())
+# ds = FolderLoad(tt.PILToTensor())
+ds = FolderLoad(compose)
 loader = DataLoader(ds,512,True,num_workers=8)
 
 device = torch.device('cuda:1')
@@ -64,30 +66,30 @@ weights = {
 gen = SimpleGenerator().to(device)
 
 #%%
-for (name,path) in weights.items():
-    gen.load_state_dict(torch.load(path))
-    # print(name)
+# for (name,path) in weights.items():
+#     gen.load_state_dict(torch.load(path))
+#     # print(name)
 
-    gen.eval()
-    inception.eval()
-    fakeFeatures,trueFeatures = [],[]
-    for batch,_ in tqdm(loader,leave=False):
-        with torch.inference_mode():
+#     gen.eval()
+#     inception.eval()
+#     fakeFeatures,trueFeatures = [],[]
+#     for batch,_ in tqdm(loader,leave=False):
+#         with torch.inference_mode():
 
-            batch = batch.to(device)
-            batch = compose(batch.float())
-            imgsFakes = gen(batch)
+#             batch = batch.to(device)
+#             batch = compose(batch.float())
+#             imgsFakes = gen(batch)
 
-            imgsFakes = preprocess(deNormalize(imgsFakes))
-            fakeFeatures_ = inception(imgsFakes)
-            trueFeatures_ = inception(preprocess(deNormalize(batch)))
+#             imgsFakes = preprocess(deNormalize(imgsFakes))
+#             fakeFeatures_ = inception(imgsFakes)
+#             trueFeatures_ = inception(preprocess(deNormalize(batch)))
 
-            fakeFeatures.append(fakeFeatures_)
-            trueFeatures.append(trueFeatures_)
+#             fakeFeatures.append(fakeFeatures_)
+#             trueFeatures.append(trueFeatures_)
 
-    fakeFeatures = torch.cat(fakeFeatures,0)
-    trueFeatures = torch.cat(trueFeatures,0)
-    print(f'{name}: {fid(trueFeatures,fakeFeatures)}')
+#     fakeFeatures = torch.cat(fakeFeatures,0)
+#     trueFeatures = torch.cat(trueFeatures,0)
+#     print(f'{name}: {fid(trueFeatures,fakeFeatures)}')
 
         
 

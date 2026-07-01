@@ -7,7 +7,7 @@ class ConvBlock(nn.Module):
         self.cnn = nn.Sequential(
             nn.Conv2d(inCh,outCh,kernel,stride,padding,**kwargs),
             nn.InstanceNorm2d(outCh),
-            nn.ReLU(inplace=True)
+            nn.ReLU(inplace=True),
         )
 
     def forward(self,x):

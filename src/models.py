@@ -239,6 +239,12 @@ class SimpleGenerator(nn.Module):
         )
     
     def forward(self,x):
+        # x = self.encoder(x)
+        # skip = x
+        # x = self.latent(x)
+        # x = x + skip
+        # x = self.decoder(x)
+        # return x
         return self.decoder(self.latent(self.encoder(x)))
     
 class SimpleCritic(nn.Module):
